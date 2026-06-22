@@ -112,7 +112,7 @@
         </div>
 
         <!-- Run the game code -->
-        <script type="text/javascript" src="html5game/shooter 1.js?cachebust=1786206312"></script>
+        <script type="text/javascript" src="html5game/shooter 1.js?cachebust=1125499478"></script>
 
         <!-- Builtin injector for injecting runner path -->
         
@@ -124,25 +124,25 @@
 
         <!-- Custom BodyEnd code is injected here -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import {
   getFirestore,
   collection,
   addDoc,
-  getDocs,
   query,
   orderBy,
-  limit
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  limit,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBcd8A_BCz66vJPwA-fvUzUdMszw1rUumg",
+  apiKey: "AIzaSyBCd8A_BCz66vJPwA-fvUzUdMszw1rUumg",
   authDomain: "leaderboard-a256a.firebaseapp.com",
   projectId: "leaderboard-a256a",
   storageBucket: "leaderboard-a256a.firebasestorage.app",
   messagingSenderId: "270594115926",
-  appId: "1:270594115926:web:d5bbd67bba0210939eeef7",
-  measurementId: "G-DV1D8ZV146"
+  appId: "1:270594115926:web:95568fcbec9623649eeef7",
+  measurementId: "G-4CE49MCVY7"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -150,43 +150,49 @@ const db = getFirestore(app);
 
 window.uploadScore = async function(playerName, score)
 {
-  try
-  {
-    await addDoc(collection(db, "leaderboard"), {
-      name: playerName,
-      score: score,
-      timestamp: Date.now()
-    });
+    try
+    {
+        await addDoc(collection(db, "scores"), {
+            name: playerName,
+            score: Number(score),
+            timestamp: Date.now()
+        });
 
-    console.log("Score uploaded");
-  }
-  catch(err)
-  {
-    console.error(err);
-  }
+        console.log("Score uploaded!");
+    }
+    catch(error)
+    {
+        console.error("Upload failed:", error);
+    }
 };
 
 window.loadLeaderboard = async function()
 {
-  const q = query(
-    collection(db, "leaderboard"),
-    orderBy("score", "desc"),
-    limit(10)
-  );
+    try
+    {
+        const q = query(
+            collection(db, "scores"),
+            orderBy("score", "desc"),
+            limit(10)
+        );
 
-  const snap = await getDocs(q);
+        const snapshot = await getDocs(q);
 
-  let result = "";
+        let results = [];
 
-  snap.forEach((doc, index) =>
-  {
-    const d = doc.data();
-    result += (index + 1) + ". " +
-              d.name + " - " +
-              d.score + "\n";
-  });
+        snapshot.forEach((doc) => {
+            results.push(doc.data());
+        });
 
-  window.leaderboardResult = result;
+        console.log("Leaderboard:", results);
+
+        return JSON.stringify(results);
+    }
+    catch(error)
+    {
+        console.error(error);
+        return "[]";
+    }
 };
 </script>
         
